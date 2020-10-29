@@ -1,13 +1,13 @@
-struct Note
+struct Note <: Object
     variables::NamedTuple
     metadata::Metadata
 end
 
-Base.pairs(note::Note) = getfield(note, :variables)
+Base.NamedTuple(note::Note) = getfield(note, :variables)
 Metadata(note::Note) = getfield(note, :metadata)
 
-Base.propertynames(note::Note) = propertynames(pairs(note))
-Base.getproperty(note::Note, name::Symbol) = pairs(note)[name]
+Base.propertynames(note::Note) = propertynames(NamedTuple(note))
+Base.getproperty(note::Note, name::Symbol) = NamedTuple(note)[name]
 
 const NOTES = Note[]
 
@@ -22,4 +22,19 @@ macro note(variables...)
         $_record_note($metadata; $(variables...))
         nothing
     end |> esc
+end
+
+function Base.summary(io::IO, note::Note)
+    print(io, "@note with ", length(NamedTuple(note)), " variable(s) for ")
+    _summary(io, Metadata(note))
+end
+
+function Base.show(io::IO, ::MIME"text/plain", note::Note)
+    summary(io, note)
+    get(io, :compact, false) && return
+    for (k, v) in pairs(NamedTuple(note))
+        println(io)
+        print(io, k, " = ")
+        show(io, v)
+    end
 end

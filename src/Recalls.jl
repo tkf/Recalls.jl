@@ -3,9 +3,11 @@ module Recalls
 export @note, @recall, recall
 
 using .Meta: isexpr
+using Dates: Second, now
 using ExprTools: combinedef, splitdef
 using Requires: @require
 
+include("core.jl")
 include("metadata.jl")
 include("calls.jl")
 include("notes.jl")

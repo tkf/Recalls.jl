@@ -1,4 +1,4 @@
-struct Record
+struct Record <: Object
     f::Any
     args::Any
     kwargs::Any
@@ -65,4 +65,65 @@ macro recall(ex)
         return esc(combinedef(def))
     end
     error("Not call or function definition:\n", ex)
+end
+
+function _summary(io, re::Record)
+    print(io, "@recall ", re.f, "(")
+    if get(io, :compact, false)
+        if isempty(re.args)
+            if !isempty(re.kwargs)
+                k, v = first(re.kwargs)
+                print(io, "; ", k, "=")
+                print(io, v)
+                print(io, ", ...")
+            end
+        elseif length(re.args) == 1
+            print(io, re.args[1])
+            if !isempty(re.kwargs)
+                print(io, "; ...")
+            end
+        else
+            print(io, re.args[1])
+            print(io, ", ...")
+        end
+    else
+        join(io, re.args, ", ")
+        if !isempty(re.kwargs)
+            isfirst = true
+            for (k, v) in pairs(re.kwargs)
+                if isfirst
+                    print(io, "; ")
+                    isfirst = true
+                else
+                    print(io, ", ")
+                end
+                print(io, k, "=", v)
+            end
+        end
+    end
+    print(io, ") at ")
+    _summary(io, re.metadata)
+end
+
+function Base.show(io::IO, ::MIME"text/plain", re::Record)
+    _summary(IOContext(io, :compact => true), re)
+    get(io, :compact, false) && return
+    if !isempty(re.args)
+        println(io)
+        print(io, length(re.args), " argument(s):")
+        for (i, a) in enumerate(re.args)
+            println(io)
+            print(io, "  #", i, " = ")
+            print(io, a)
+        end
+    end
+    if !isempty(re.kwargs)
+        println(io)
+        print(io, length(re.kwargs), " keyword argument(s):")
+        for (k, v) in pairs(re.kwargs)
+            println(io)
+            print(io, "  ", k, " = ")
+            print(io, v)
+        end
+    end
 end
