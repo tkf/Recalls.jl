@@ -7,8 +7,13 @@ using ExprTools: combinedef, splitdef
 using Requires: @require
 
 include("calls.jl")
-include("no_juliainterpreter.jl")
 include("notes.jl")
+
+# `no_juliainterpreter.jl` includes `juliainterpreter.jl` with a fake
+# `Juliainterpreter` module for defining `_call` without a breakpoint.
+# `_call` will be re-defined at run-time after `JuliaInterpreter` is
+# loaded
+include("no_juliainterpreter.jl")
 
 function __init__()
     @require JuliaInterpreter = "aa1ae85d-cabe-5617-a682-6adf51b2e16a" include("juliainterpreter.jl")
