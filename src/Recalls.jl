@@ -1,6 +1,6 @@
 module Recalls
 
-export @recall, recall
+export @note, @recall, recall
 
 using .Meta: isexpr
 using ExprTools: combinedef, splitdef
@@ -78,6 +78,8 @@ end
 function __init__()
     @require JuliaInterpreter = "aa1ae85d-cabe-5617-a682-6adf51b2e16a" include("juliainterpreter.jl")
 end
+
+include("notes.jl")
 
 # Use README as the docstring of the module:
 @doc let path = joinpath(dirname(@__DIR__), "README.md")
