@@ -3,6 +3,10 @@ uuid = "30af7cf3-eb43-44c7-afa7-33725b72a81e"
 authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+ExprTools = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+
 [compat]
 julia = "1"
 
