@@ -7,16 +7,21 @@ end
 
 (re::Record)() = _call(re)
 
-const HISTORY = Record[]
+"""
+    Recalls.CALLS
+
+This is a vector of records created by [`@recall`](@ref).
+"""
+const CALLS = Record[]
 
 function _record(metadata, f, args...; kwargs...)
     @nospecialize
-    push!(HISTORY, Record(f, args, kwargs, metadata))
+    push!(CALLS, Record(f, args, kwargs, metadata))
     return
 end
 
 recorder(f, metadata) = function _recorder_(args...; kwargs...)
-    push!(HISTORY, Record(f, args, kwargs, metadata))
+    push!(CALLS, Record(f, args, kwargs, metadata))
     return f(args...; kwargs...)
 end
 
@@ -24,9 +29,11 @@ end
     recall()
 
 Re-run the last call to function `f` instrumented by `@recall f(...)`.
+
+This is a shortcut of `Recalls.CALLS[end]()`.
 """
 recall() =
-    _call(HISTORY[end]) # NOTE: Hit `c` (continue) to jump to the point just before the actual call, if you are in a debugger.
+    _call(CALLS[end]) # NOTE: Hit `c` (continue) to jump to the point just before the actual call, if you are in a debugger.
 
 #=
 macro recall()
@@ -49,6 +56,8 @@ as_kwarg(ex::Expr) =
     @recall f(...)
 
 Record history of function calls.
+
+See also: [`Recalls`](@ref), [`recall`](@ref).
 """
 macro recall(ex)
     metadata = metadata_expr(__source__, __module__)

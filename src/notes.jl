@@ -9,6 +9,11 @@ Metadata(note::Note) = getfield(note, :metadata)
 Base.propertynames(note::Note) = propertynames(NamedTuple(note))
 Base.getproperty(note::Note, name::Symbol) = NamedTuple(note)[name]
 
+"""
+    Recalls.NOTES
+
+This is a vector of notes created by `@note`.
+"""
 const NOTES = Note[]
 
 function _record_note(metadata; variables...)
