@@ -1,7 +1,3 @@
-struct Metadata
-    source::LineNumberNode
-end
-
 struct Note
     variables::NamedTuple
     metadata::Metadata
@@ -15,14 +11,15 @@ Base.getproperty(note::Note, name::Symbol) = pairs(note)[name]
 
 const NOTES = Note[]
 
-function _record_note(source::LineNumberNode; variables...)
+function _record_note(metadata; variables...)
     @nospecialize variables
-    push!(NOTES, Note((; variables...), Metadata(source)))
+    push!(NOTES, Note((; variables...), metadata))
 end
 
 macro note(variables...)
+    metadata = metadata_expr(__source__, __module__)
     quote
-        $_record_note($(QuoteNode(__source__)); $(variables...))
+        $_record_note($metadata; $(variables...))
         nothing
     end |> esc
 end

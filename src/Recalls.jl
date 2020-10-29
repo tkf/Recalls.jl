@@ -6,6 +6,7 @@ using .Meta: isexpr
 using ExprTools: combinedef, splitdef
 using Requires: @require
 
+include("metadata.jl")
 include("calls.jl")
 include("notes.jl")
 

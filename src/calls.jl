@@ -2,20 +2,21 @@ struct Record
     f::Any
     args::Any
     kwargs::Any
+    metadata::Metadata
 end
 
 (re::Record)() = _call(re)
 
 const HISTORY = Record[]
 
-function _record(f, args...; kwargs...)
+function _record(metadata, f, args...; kwargs...)
     @nospecialize
-    push!(HISTORY, Record(f, args, kwargs))
+    push!(HISTORY, Record(f, args, kwargs, metadata))
     return
 end
 
-recorder(f) = function _recorder_(args...; kwargs...)
-    push!(HISTORY, Record(f, args, kwargs))
+recorder(f, metadata) = function _recorder_(args...; kwargs...)
+    push!(HISTORY, Record(f, args, kwargs, metadata))
     return f(args...; kwargs...)
 end
 
@@ -50,15 +51,16 @@ as_kwarg(ex::Expr) =
 Record history of function calls.
 """
 macro recall(ex)
+    metadata = metadata_expr(__source__, __module__)
     if isexpr(ex, :call)
-        return esc(Expr(ex.head, :($recorder($(ex.args[1]))), ex.args[2:end]...))
+        return esc(Expr(ex.head, :($recorder($(ex.args[1]), $metadata)), ex.args[2:end]...))
     elseif (def = splitdef(ex)) !== nothing
         f = get(def, :name, nothing)
         f === nothing && error("Cannot record an anonymous function:\n", ex)
         args = def[:args]
         kwargs = map(as_kwarg, get(def, :kwargs, []))
         def[:body] = Expr(:block, quote
-            $_record($f, $(args...); $(kwargs...))
+            $_record($metadata, $f, $(args...); $(kwargs...))
         end, def[:body])
         return esc(combinedef(def))
     end
