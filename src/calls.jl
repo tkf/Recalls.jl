@@ -1,13 +1,3 @@
-module Recalls
-
-export @note, @recall, recall
-
-using .Meta: isexpr
-using ExprTools: combinedef, splitdef
-using Requires: @require
-
-include("no_juliainterpreter.jl")
-
 struct Record
     f::Any
     args::Any
@@ -73,18 +63,4 @@ macro recall(ex)
         return esc(combinedef(def))
     end
     error("Not call or function definition:\n", ex)
-end
-
-function __init__()
-    @require JuliaInterpreter = "aa1ae85d-cabe-5617-a682-6adf51b2e16a" include("juliainterpreter.jl")
-end
-
-include("notes.jl")
-
-# Use README as the docstring of the module:
-@doc let path = joinpath(dirname(@__DIR__), "README.md")
-    include_dependency(path)
-    replace(read(path, String), r"^```julia"m => "```jldoctest README")
-end Recalls
-
 end
