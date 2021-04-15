@@ -21,10 +21,38 @@ function _record_note(metadata; variables...)
     push!(NOTES, Note((; variables...), metadata))
 end
 
+raw"""
+    @note var₁ var₂ … varₙ
+
+Record variables `varᵢ`.
+
+Each `varᵢ` can take the following form:
+
+1. a symbol prefixed by `$` (e.g., `$x`)
+2. an assignment with the right hand side prefixed by `$` (e.g., `lhs = $rhs`)
+3. a symbol (e.g., `x`)
+4. an assignment (e.g., `lhs = rhs`)
+
+Expressions prefixed by `$` will be `deepcopy`ed.
+"""
 macro note(variables...)
     metadata = metadata_expr(__source__, __module__)
+    kwargs = map(variables) do v
+        if v isa Symbol
+            Expr(:kw, v, v)
+        elseif Meta.isexpr(v, :$, 1) && v.args[1] isa Symbol
+            Expr(:kw, v.args[1], :($deepcopy($(v.args[1]))))
+        elseif (
+                (Meta.isexpr(v, :(=), 2) || Meta.isexpr(v, :kw, 2)) &&
+                Meta.isexpr(v.args[2], :$, 1)
+            )
+            Expr(:kw, v.args[1], :($deepcopy($(v.args[2].args[1]))))
+        else
+            v
+        end
+    end
     quote
-        $_record_note($metadata; $(variables...))
+        $_record_note($metadata; $(kwargs...))
         nothing
     end |> esc
 end
