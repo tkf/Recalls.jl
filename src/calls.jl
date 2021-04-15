@@ -2,6 +2,7 @@ struct Record <: Object
     f::Any
     args::Any
     kwargs::Any
+    isdo::Bool
     metadata::Metadata
 end
 
@@ -16,12 +17,12 @@ const CALLS = Record[]
 
 function _record(metadata, f, args...; kwargs...)
     @nospecialize
-    push!(CALLS, Record(f, args, kwargs, metadata))
+    push!(CALLS, Record(f, args, kwargs, false, metadata))
     return
 end
 
-recorder(f, metadata) = function _recorder_(args...; kwargs...)
-    push!(CALLS, Record(f, args, kwargs, metadata))
+recorder(f, isdo, metadata) = function _recorder_(args...; kwargs...)
+    push!(CALLS, Record(f, args, kwargs, isdo, metadata))
     return f(args...; kwargs...)
 end
 
@@ -54,6 +55,7 @@ as_kwarg(ex::Expr) =
 """
     @recall function f(...) ... end
     @recall f(...)
+    @recall f(...) do ... end
 
 Record history of function calls.
 
@@ -62,7 +64,10 @@ See also: [`Recalls`](@ref), [`recall`](@ref).
 macro recall(ex)
     metadata = metadata_expr(__source__, __module__)
     if isexpr(ex, :call)
-        return esc(Expr(ex.head, :($recorder($(ex.args[1]), $metadata)), ex.args[2:end]...))
+        return esc(Expr(ex.head, :($recorder($(ex.args[1]), false, $metadata)), ex.args[2:end]...))
+    elseif isexpr(ex, :do)
+        ex.args[1].args[1] = :($recorder($(ex.args[1].args[1]), true, $metadata))
+        return esc(ex)
     elseif (def = splitdef(ex)) !== nothing
         f = get(def, :name, nothing)
         f === nothing && error("Cannot record an anonymous function:\n", ex)
