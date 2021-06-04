@@ -2,10 +2,12 @@ struct Metadata <: Object
     source::LineNumberNode
     _module::Module
     location::UUID
+    threadid::Int
     timestamp::typeof(time())
 end
 
-Metadata(source, _module, location = UUID(0)) = Metadata(source, _module, location, time())
+Metadata(source, _module, location = UUID(0)) =
+    Metadata(source, _module, location, Threads.threadid(), time())
 
 metadata_expr(__source__, __module__) =
     :($Metadata($(QuoteNode(__source__)), $(QuoteNode(__module__)), $(QuoteNode(uuid4()))))

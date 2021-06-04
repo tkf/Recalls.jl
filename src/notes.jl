@@ -79,6 +79,7 @@ function note_table(notes = NOTES)
         file = Union{Nothing,Symbol}[],
         _module = Module[],
         location = UUID[],
+        threadid = Int[],
         timestamp = typeof(time())[],
     )
     for i in eachindex(notes)
@@ -90,6 +91,7 @@ function note_table(notes = NOTES)
         push!(table.file, metadata.source.file)
         push!(table._module, metadata._module)
         push!(table.location, metadata.location)
+        push!(table.threadid, metadata.threadid)
         push!(table.timestamp, metadata.timestamp)
     end
     return table
