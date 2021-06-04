@@ -1,0 +1,11 @@
+name = "RecallsAnalysis"
+uuid = "881f4836-eb65-49f3-80c9-ef819cfd23bf"
+authors = ["Takafumi Arakaki <aka.tkf@gmail.com> and contributors"]
+version = "0.1.0"
+
+[deps]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Recalls = "30af7cf3-eb43-44c7-afa7-33725b72a81e"
+
+[compat]
+julia = "1"

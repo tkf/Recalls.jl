@@ -71,3 +71,26 @@ function Base.show(io::IO, ::MIME"text/plain", note::Note)
         show(io, v)
     end
 end
+
+function note_table(notes = NOTES)
+    table = (
+        variables = NamedTuple[],
+        line = Int[],
+        file = Union{Nothing,Symbol}[],
+        _module = Module[],
+        location = UUID[],
+        timestamp = typeof(time())[],
+    )
+    for i in eachindex(notes)
+        n = notes[i]
+        variables = NamedTuple(n)
+        metadata = Metadata(n)
+        push!(table.variables, variables)
+        push!(table.line, metadata.source.line)
+        push!(table.file, metadata.source.file)
+        push!(table._module, metadata._module)
+        push!(table.location, metadata.location)
+        push!(table.timestamp, metadata.timestamp)
+    end
+    return table
+end
