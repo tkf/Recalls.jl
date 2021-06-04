@@ -6,6 +6,7 @@ using .Meta: isexpr
 using Dates: Second, now
 using ExprTools: combinedef, splitdef
 using Requires: @require
+using UUIDs: UUID, uuid4
 
 include("core.jl")
 include("metadata.jl")

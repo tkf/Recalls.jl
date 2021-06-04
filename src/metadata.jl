@@ -1,13 +1,14 @@
 struct Metadata <: Object
     source::LineNumberNode
     _module::Module
+    location::UUID
     timestamp::typeof(time())
 end
 
-Metadata(source, _module) = Metadata(source, _module, time())
+Metadata(source, _module, location = UUID(0)) = Metadata(source, _module, location, time())
 
 metadata_expr(__source__, __module__) =
-    :($Metadata($(QuoteNode(__source__)), $(QuoteNode(__module__))))
+    :($Metadata($(QuoteNode(__source__)), $(QuoteNode(__module__)), $(QuoteNode(uuid4()))))
 
 function _summary(io, metadata::Metadata)
     dt = roughly_as_datetime(metadata.timestamp)
