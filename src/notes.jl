@@ -80,7 +80,7 @@ function note_table(notes = NOTES)
         _module = Module[],
         location = UUID[],
         threadid = Int[],
-        timestamp = typeof(time())[],
+        timestamp = TimeStamp[],
     )
     for i in eachindex(notes)
         n = notes[i]

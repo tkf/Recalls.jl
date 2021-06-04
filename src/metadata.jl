@@ -1,13 +1,15 @@
+const TimeStamp = typeof(time_ns())
+
 struct Metadata <: Object
     source::LineNumberNode
     _module::Module
     location::UUID
     threadid::Int
-    timestamp::typeof(time())
+    timestamp::TimeStamp
 end
 
 Metadata(source, _module, location = UUID(0)) =
-    Metadata(source, _module, location, Threads.threadid(), time())
+    Metadata(source, _module, location, Threads.threadid(), time_ns())
 
 metadata_expr(__source__, __module__) =
     :($Metadata($(QuoteNode(__source__)), $(QuoteNode(__module__)), $(QuoteNode(uuid4()))))
@@ -28,4 +30,4 @@ function Base.show(io::IO, ::MIME"text/plain", metadata::Metadata)
     print(io, ">")
 end
 
-roughly_as_datetime(t::Real) = now() + Second(floor(Int, time() - t))
+roughly_as_datetime(t::TimeStamp) = now() + Second(floor(Int, (time_ns() - t) * 1e-9))
