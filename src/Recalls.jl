@@ -19,6 +19,7 @@ include("notes.jl")
 include("no_juliainterpreter.jl")
 
 function __init__()
+    init!(NOTES)
     @require JuliaInterpreter = "aa1ae85d-cabe-5617-a682-6adf51b2e16a" include("juliainterpreter.jl")
 end
 

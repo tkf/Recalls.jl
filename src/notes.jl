@@ -14,11 +14,11 @@ Base.getproperty(note::Note, name::Symbol) = NamedTuple(note)[name]
 
 This is a vector of notes created by `@note`.
 """
-const NOTES = Note[]
+const NOTES = GlobalRecord{Note}()
 
 function _record_note(metadata; variables...)
     @nospecialize variables
-    push!(NOTES, Note((; variables...), metadata))
+    put!(NOTES, Note((; variables...), metadata))
 end
 
 raw"""
