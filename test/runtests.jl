@@ -1,6 +1,7 @@
+using Aqua
 using Recalls
 using Test
 
-@testset "Recalls.jl" begin
-    # Write your tests here.
+@testset "Aqua" begin
+    Aqua.test_all(Recalls)
 end
