@@ -72,6 +72,11 @@ function Base.show(io::IO, ::MIME"text/plain", note::Note)
     end
 end
 
+function sortbytime!(notes = NOTES)
+    sort!(notes.buffer, by = n -> Metadata(n).timestamp)
+    return notes
+end
+
 function note_table(notes = NOTES)
     table = (
         variables = NamedTuple[],
